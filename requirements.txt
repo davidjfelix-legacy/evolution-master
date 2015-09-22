@@ -1,2 +1,5 @@
 pyyaml
 pygit2
+requests
+requests-futures
+futures
