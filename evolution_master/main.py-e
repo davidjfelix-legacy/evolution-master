@@ -9,6 +9,9 @@ def main(args):
     ## Fetch all Git repos
     ## Check that specified modules exist within git repos
     ## Import modules in order specified within broodfile
+    for module in modules:
+        try:
+            __import__(module)
     
     
 if __name__ == "__main__":
