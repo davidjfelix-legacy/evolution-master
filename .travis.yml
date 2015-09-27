@@ -1,5 +1,12 @@
 language: python
 sudo: false
+addons:
+  apt:
+    packages:
+      - gcc
+      - python-dev
+      - python3-dev
+      - libgit2-dev
 python:
   - "2.6"
   - "2.7"
