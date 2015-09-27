@@ -1,3 +1,4 @@
+cffi
 pyyaml
 pygit2
 requests
