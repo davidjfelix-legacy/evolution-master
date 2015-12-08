@@ -1,7 +1,35 @@
 #!/usr/bin/python
 # In Yosemite and Mavericks, this is 2.7.10
+from getpass import getpass
 from subprocess import Popen
+from distutils.util import strtobool
 
+# 2to3
+try:
+    input = raw_input
+except NameError:
+    pass
+
+def get_http_proxy():
+    port = input("Proxy Port: ")
+    host = input("Proxy Host: http://")
+    while True:
+        resp = input("Does your proxy require authentication? [Y/n]: ")
+        try:
+            has_auth = strtobool(resp)
+            break
+        except ValueError:
+            pass
+    if has_auth:
+        usernm, passwd = get_auth()
+        return "http://{}:{}@{}:{}".format(usernm, passwd, host, port)
+    else:
+        return "http://{}:{}".format(host, port)
+
+def get_auth():
+    usernm = input("Username: ")
+    passwd = getpass()
+    return (usernm, passwd)
 
 def install_xcode_clt_pkg(pkg_file):
     Popen(['sudo', 'install', '-pkg', pkg_file, '-target', '/']).wait()
