@@ -3,7 +3,7 @@
 from subprocess import Popen
 
 
-def install_xcode_clt_pkg(pkg_file)
+def install_xcode_clt_pkg(pkg_file):
     Popen(['sudo', 'install', '-pkg', pkg_file, '-target', '/']).wait()
 
 
