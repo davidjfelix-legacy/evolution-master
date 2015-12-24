@@ -3,6 +3,9 @@
 
 # The version of Python to use
 version="3.5.0"
+user=$(whoami)
+group=$(groups | cut -f1 -d" ")
+procs=$(($(nproc) * 2))
 
 # Get packages required for bootstrapping (this currently includes building python, unfortunately)
 sudo apt-get update
@@ -19,10 +22,12 @@ sudo apt-get -y install git \
 
 # Create the directory that all this will live in
 sudo mkdir -p /opt/evolution-master
+sudo chown $user:$group -R /opt
+
 
 # Make a temporary directory in /tmp/ and download pythong source
 dir=$(mktemp -d "evolution-master.python.XXXXXXXXXX" --tmpdir)
-wget https://www.python.org/ftp/python/$version/Python-$version.tar.xz -O $dir/python.tar.xz
+wget https://www.python.org/ftp/python/$version/Python-$version.tar.xz -O $dir/Python-$version.tar.xz
 
 # Unxz & untar python Source
 cd $dir
@@ -31,5 +36,5 @@ cd $dir/Python-$version
 
 # Configure and build python in /tmp then deploy it to /opt
 $dir/Python-$version/configure --prefix=/opt/evolution-master/python
-make
-sudo make install
+make -j $procs
+make install
