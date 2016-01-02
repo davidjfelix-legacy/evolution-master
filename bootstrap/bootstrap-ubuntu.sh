@@ -3,10 +3,16 @@
 
 # The version of Python to use
 version="3.5.0"
+
+# user and group to de-escalate as
 user=$(whoami)
 group=$(groups | cut -f1 -d" ")
+
+# number of processes to run make with
 procs=$(($(nproc) * 2))
 
+
+##################################### Get Python installed in opt
 # Get packages required for bootstrapping (this currently includes building python, unfortunately)
 sudo apt-get update
 sudo apt-get -y install git \
@@ -38,3 +44,10 @@ cd $dir/Python-$version
 $dir/Python-$version/configure --prefix=/opt/evolution-master/python
 make -j $procs
 make install
+###############################################
+############################################### Get brood
+
+# Need to prompt for the brood repo
+# Get the brood repo
+# assemble brood repo
+# apply brood repo
