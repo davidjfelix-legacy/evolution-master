@@ -47,7 +47,12 @@ make install
 ###############################################
 ############################################### Get brood
 
-# Need to prompt for the brood repo
+# FIXME: Need to prompt for the brood repo
+
 # Get the brood repo
+cd /opt/evolution-master
+git pull https://github.com/hatchery/genepool
+cd genepool
+sudo ../python/bin/python3
 # assemble brood repo
 # apply brood repo
