@@ -1,0 +1,14 @@
+[package]
+name = "evolution-master"
+version = "0.0.1"
+authors = [ "David J Felix <felix.davidj@gmail.com>" ]
+
+[dependencies.cpython]
+git = "https://github.com/dgrunwald/rust-cpython.git"
+features = ["python-3-5"]
+links = "python-3-5"
+
+
+[dependencies.python-3-5]
+git = "https://github.com/python/cpython"
+branch = "3.5"
