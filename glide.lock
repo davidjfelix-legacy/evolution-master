@@ -1,0 +1,12 @@
+hash: b747e0e4f334568057be707850dfc96c4871dcb4fd10b692cdbe4f2f9bf50c33
+updated: 2016-02-08T10:24:09.68462248-05:00
+imports:
+- name: github.com/codegangsta/cli
+  version: 565493f259bf868adb54d45d5f4c68d405117adf
+  repo: https://github.com/codegangsta/cli
+  vcs: git
+- name: github.com/hashicorp/hcl
+  version: 8cc810768200e949a2a92972845244f6a818f68d
+  repo: https://github.com/hashicorp/hcl
+  vcs: git
+devImports: []
