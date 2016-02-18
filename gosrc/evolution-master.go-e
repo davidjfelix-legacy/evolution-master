@@ -1,11 +1,17 @@
 package main
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
-	cli "github.com/codegangsta/cli"
+	"io"
 	"os"
 	"os/exec"
 	"strings"
+
+	ast "github.com/hashicorp/hcl/ast"
+	cli "github.com/codegangsta/cli"
+	hcl "github.com/hashicorp/hcl"
 )
 
 type Config struct {
@@ -15,6 +21,41 @@ type Config struct {
 type GenepoolConfig struct {
 	GitRepositoryURL string `hcl:git`
 	Genes []string `hcl:genes`
+}
+
+func Parse(r io.Reader) (*Config, error) {
+	var buf bytes.Buffer
+	if _, err := io.Copy(&buf, r); err != nil {
+		return nil, err
+	}
+
+	root, err := hcl.Parse(buf.String())
+	if err != nil {
+		return nil, err
+	}
+	buf.Reset()
+
+	list, ok := root.Node.(*ast.ObjectList)
+	if !ok {
+		return nil, fmt.Errorf("error parsing: root should be an object")
+	}
+
+	genepools := list.Filter("genepool")
+	if len(genepools.Items) == 0 {
+		return nil, fmt.Errorf("no 'genepool' stanza found")
+	}
+
+	var config Config
+	config.GenepoolConfigs, err = ParseGenepoolConfigs(genepools)
+	if err != nil {
+		return nil, err
+	}
+
+	return &config, nil
+}
+
+func ParseGenepoolConfigs(list *ast.ObjectList) ([]*GenepoolConfig, error) {
+	return nil, nil
 }
 
 func bootstrap(ctx *cli.Context) {
@@ -27,7 +68,7 @@ func splice(ctx *cli.Context) {
 	}
 
 	broodPath := ctx.Args().First()
-	var config string
+	var config *Config
 
 	if strings.HasPrefix(broodPath, "https://") || strings.HasPrefix(broodPath, "http://") {
 		// FIXME: recover error and log here
@@ -39,12 +80,22 @@ func splice(ctx *cli.Context) {
 	fmt.Printf("%s\n", config)
 }
 
-func loadFileConfig(path string) (string, error) {
-	return "", nil
+func loadFileConfig(path string) (*Config, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+
+	config, err := Parse(file)
+	if err != nil {
+		return nil, err
+	}
+
+	return config, nil
 }
 
-func loadWebConfig(url string, proxy string) (string, error) {
-	return "", nil
+func loadWebConfig(url string, proxy string) (*Config, error) {
+	return nil, nil
 }
 
 func autoreclaim(ctx *cli.Context) {
