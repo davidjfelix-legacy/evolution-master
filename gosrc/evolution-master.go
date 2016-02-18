@@ -8,6 +8,15 @@ import (
 	"strings"
 )
 
+type Config struct {
+	GenepoolConfigs []*GenepoolConfig
+}
+
+type GenepoolConfig struct {
+	GitRepositoryURL string `hcl:git`
+	Genes []string `hcl:genes`
+}
+
 func bootstrap(ctx *cli.Context) {
 }
 
