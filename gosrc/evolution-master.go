@@ -2,14 +2,15 @@ package main
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"strings"
+	"net/http"
+	"net/url"
 
-	ast "github.com/hashicorp/hcl/ast"
+	ast "github.com/hashicorp/hcl/hcl/ast"
 	cli "github.com/codegangsta/cli"
 	hcl "github.com/hashicorp/hcl"
 )
@@ -94,8 +95,33 @@ func loadFileConfig(path string) (*Config, error) {
 	return config, nil
 }
 
-func loadWebConfig(url string, proxy string) (*Config, error) {
-	return nil, nil
+func loadWebConfig(fileRawURL string, proxyRawURL string) (*Config, error) {
+	proxyURL, err := url.Parse(proxyRawURL)
+	if err != nil {
+		return nil, err
+	}
+
+	transport := &http.Transport{
+		Proxy: http.ProxyURL(proxyURL),
+	}
+	client := &http.Client{
+		Transport: transport,
+	}
+	
+	resp, err := client.Get(fileRawURL)
+	if err != nil {
+		return nil, err
+	}
+	if resp.Status != 200 {
+		return nil, fmt.Errorf("could not fetch URL")
+	}
+	
+	config, err := Parse(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return config, nil
 }
 
 func autoreclaim(ctx *cli.Context) {
