@@ -1,3 +1,6 @@
 package: .
 import:
 - package: github.com/codegangsta/cli
+- package: github.com/hashicorp/hcl
+  subpackages:
+  - hcl/ast
