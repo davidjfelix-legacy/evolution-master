@@ -10,19 +10,15 @@ import (
 	"net/http"
 	"net/url"
 
-	ast "github.com/hashicorp/hcl/hcl/ast"
-	cli "github.com/codegangsta/cli"
-	hcl "github.com/hashicorp/hcl"
+	"github.com/hashicorp/hcl/hcl/ast"
+	"github.com/codegangsta/cli"
+	"github.com/hashicorp/hcl"
 )
 
 type Config struct {
 	GenepoolConfigs []*GenepoolConfig
 }
 
-type GenepoolConfig struct {
-	GitRepositoryURL string `hcl:git`
-	Genes []string `hcl:genes`
-}
 
 func Parse(r io.Reader) (*Config, error) {
 	var buf bytes.Buffer
@@ -55,9 +51,6 @@ func Parse(r io.Reader) (*Config, error) {
 	return &config, nil
 }
 
-func ParseGenepoolConfigs(list *ast.ObjectList) ([]*GenepoolConfig, error) {
-	return nil, nil
-}
 
 func bootstrap(ctx *cli.Context) {
 }
@@ -107,7 +100,7 @@ func loadWebConfig(fileRawURL string, proxyRawURL string) (*Config, error) {
 	client := &http.Client{
 		Transport: transport,
 	}
-	
+
 	resp, err := client.Get(fileRawURL)
 	if err != nil {
 		return nil, err
@@ -115,7 +108,7 @@ func loadWebConfig(fileRawURL string, proxyRawURL string) (*Config, error) {
 	if resp.Status != 200 {
 		return nil, fmt.Errorf("could not fetch URL")
 	}
-	
+
 	config, err := Parse(resp.Body)
 	if err != nil {
 		return nil, err
