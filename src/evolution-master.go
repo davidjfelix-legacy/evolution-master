@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -18,7 +19,6 @@ import (
 type Config struct {
 	GenepoolConfigs []*GenepoolConfig
 }
-
 
 func Parse(r io.Reader) (*Config, error) {
 	var buf bytes.Buffer
@@ -51,27 +51,36 @@ func Parse(r io.Reader) (*Config, error) {
 	return &config, nil
 }
 
-
 func bootstrap(ctx *cli.Context) {
+
 }
 
 func splice(ctx *cli.Context) {
+	// Get the Brood file path from the first command argument
 	if len(ctx.Args()) != 1 {
-		// FIXME: log here
-		return
+		log.Fatal("Could not parse brood path. Form is: evolution-master splice [PATH | URL]")
 	}
-
 	broodPath := ctx.Args().First()
-	var config *Config
 
+	var config *Config
+	var err error
+
+	// Load the config based on whether it's a path or a URL
 	if strings.HasPrefix(broodPath, "https://") || strings.HasPrefix(broodPath, "http://") {
-		// FIXME: recover error and log here
-		config, _ = loadWebConfig(broodPath, ctx.String("http_proxy"))
+		config, err = loadWebConfig(broodPath, ctx.String("http_proxy"))
 	} else {
-		// FIXME: recover error and log here
-		config, _ = loadFileConfig(broodPath)
+		config, err = loadFileConfig(broodPath)
 	}
-	fmt.Printf("%s\n", config)
+
+	if err != nil {
+		log.Fatalf("Could not get brood file: %s", err)
+	}
+
+	// Walk through the config and splice the genes
+	for _, genepool := range config.GenepoolConfigs {
+		path := ctx.String("root-dir") + genepool.Name
+		gitCloneGenepool(genepool.GitRepositoryURL, path)
+	}
 }
 
 func loadFileConfig(path string) (*Config, error) {
@@ -89,28 +98,35 @@ func loadFileConfig(path string) (*Config, error) {
 }
 
 func loadWebConfig(fileRawURL string, proxyRawURL string) (*Config, error) {
-	proxyURL, err := url.Parse(proxyRawURL)
-	if err != nil {
-		return nil, err
+	// Utilize a proxy for the http client if there is one
+	var client *http.Client
+	if proxyRawURL != "" {
+		proxyURL, err := url.Parse(proxyRawURL)
+		if err != nil {
+			log.Printf("Failed to parse proxy URL: %s", err)
+			return nil, err
+		}
+		transport := &http.Transport{Proxy: http.ProxyURL(proxyURL)}
+		client = &http.Client{Transport: transport}
+
+	} else {
+		client = &http.Client{}
 	}
 
-	transport := &http.Transport{
-		Proxy: http.ProxyURL(proxyURL),
-	}
-	client := &http.Client{
-		Transport: transport,
-	}
-
+	// Fetch the file at the given URL
 	resp, err := client.Get(fileRawURL)
 	if err != nil {
+		log.Printf("Failed to get URL: %s", err)
 		return nil, err
 	}
-	if resp.Status != 200 {
+	if resp.Status != "200" {
 		return nil, fmt.Errorf("could not fetch URL")
 	}
 
+	// Parse the file to get config values
 	config, err := Parse(resp.Body)
 	if err != nil {
+		log.Printf("Failed to parse body: %s", err)
 		return nil, err
 	}
 
@@ -118,6 +134,11 @@ func loadWebConfig(fileRawURL string, proxyRawURL string) (*Config, error) {
 }
 
 func autoreclaim(ctx *cli.Context) {
+	rootDir := ctx.String("root-dir")
+	err := os.RemoveAll(rootDir)
+	if err != nil {
+		log.Fatalf("Unable to autoreclaim %s", rootDir)
+	}
 }
 
 func runEvolutionMaster(ctx *cli.Context) {
