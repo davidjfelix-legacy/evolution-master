@@ -52,7 +52,20 @@ func Parse(r io.Reader) (*Config, error) {
 }
 
 func bootstrap(ctx *cli.Context) {
-
+	// Set an environment variable so it can remove itself later
+	/*file, err := os.OpenFile("/etc/environment", os.O_APPEND | os.O_CREATE | os.O_WRONLY, 0666)
+	if err != nil {
+		log.Fatalf("Could not open /etc/environment: %s; try running as root", err.Error())
+	}
+	_, err = file.WriteString("EVOLUTION_MASTER_PATH=" + ctx.String("root-dir"))
+	if err != nil {
+		defer file.Close()
+		log.Fatalf("Could not write to /etc/environment: %s", err.Error())
+	}
+	file.Close()
+	*/
+	// Build the opt directory structure
+	// Clone
 }
 
 func splice(ctx *cli.Context) {
@@ -73,13 +86,16 @@ func splice(ctx *cli.Context) {
 	}
 
 	if err != nil {
-		log.Fatalf("Could not get brood file: %s", err)
+		log.Fatalf("Could not get brood file: %s", err.Error())
 	}
 
-	// Walk through the config and splice the genes
+	// Walk through the config and work with the genepools
 	for _, genepool := range config.GenepoolConfigs {
-		path := ctx.String("root-dir") + genepool.Name
+		// FIXME: handle error
+		repoURL, _ := url.Parse(genepool.GitRepositoryURL)
+		path := ctx.String("root-dir") + "/" + repoURL.Host + repoURL.Path
 		gitCloneGenepool(genepool.GitRepositoryURL, path)
+		// Walk through each gene and build its tree
 	}
 }
 
@@ -103,7 +119,7 @@ func loadWebConfig(fileRawURL string, proxyRawURL string) (*Config, error) {
 	if proxyRawURL != "" {
 		proxyURL, err := url.Parse(proxyRawURL)
 		if err != nil {
-			log.Printf("Failed to parse proxy URL: %s", err)
+			log.Printf("Failed to parse proxy URL: %s", err.Error())
 			return nil, err
 		}
 		transport := &http.Transport{Proxy: http.ProxyURL(proxyURL)}
@@ -116,7 +132,7 @@ func loadWebConfig(fileRawURL string, proxyRawURL string) (*Config, error) {
 	// Fetch the file at the given URL
 	resp, err := client.Get(fileRawURL)
 	if err != nil {
-		log.Printf("Failed to get URL: %s", err)
+		log.Printf("Failed to get URL: %s", err.Error())
 		return nil, err
 	}
 	if resp.Status != "200" {
@@ -126,7 +142,7 @@ func loadWebConfig(fileRawURL string, proxyRawURL string) (*Config, error) {
 	// Parse the file to get config values
 	config, err := Parse(resp.Body)
 	if err != nil {
-		log.Printf("Failed to parse body: %s", err)
+		log.Printf("Failed to parse body: %s", err.Error())
 		return nil, err
 	}
 
@@ -145,12 +161,14 @@ func runEvolutionMaster(ctx *cli.Context) {
 	gitCloneGenepool("https://github.com/hatchery/Brood2", "/opt/Brood2")
 }
 
-func gitCloneGenepool(url string, path string) error {
+func gitCloneGenepool(rawURL string, path string) error {
 	err := os.RemoveAll(path)
 	if err != nil {
 		return err
 	}
-	out, _ := exec.Command("git", "clone", url, path).CombinedOutput()
+	// FIXME: build path
+	// FIXME: handle error here
+	out, _ := exec.Command("git", "clone", rawURL, path).CombinedOutput()
 	fmt.Printf("%s\n", out)
 	return nil
 }
