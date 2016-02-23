@@ -99,6 +99,35 @@ func splice(ctx *cli.Context) {
 	}
 }
 
+type GeneDependency struct {
+	Genepool string
+	Ref string
+	Gene string
+}
+
+// Get the top level brood file
+// for each genepool directive
+// // get the genepool if it is not gotten
+// // check out the commit/whatever
+// // place the genes in a directory if that does not exist
+// // get the brood file for the genes
+// // recursively get the genepools if not gotten
+// // recursively check out the commit/whatever
+// // recursively place the genes in a directory if that does not exist
+// // run the genes
+
+func fetchGenepoolAndGetDependencies() ([]GeneDependency, error) {
+	return nil, nil
+}
+
+func setUpTopLevelGenes() {
+	// Place top level genes into a runable dir
+}
+
+func runTopLevelGenes() {
+	// Run the top level genes
+}
+
 func loadFileConfig(path string) (*Config, error) {
 	file, err := os.Open(path)
 	if err != nil {
