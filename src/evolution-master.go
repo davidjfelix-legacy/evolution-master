@@ -97,12 +97,6 @@ func splice(ctx *cli.Context) {
 	}
 }
 
-type GeneDependency struct {
-	Genepool string
-	Ref string
-	Gene string
-}
-
 // Get the top level brood file
 // for each genepool directive
 // // get the genepool if it is not gotten
@@ -114,7 +108,7 @@ type GeneDependency struct {
 // // recursively place the genes in a directory if that does not exist
 // // run the genes
 
-func fetchGenepoolAndGetDependencies() ([]GeneDependency, error) {
+func fetchGenepoolAndGetDependencies() ([]*GenepoolConfig, error) {
 	return nil, nil
 }
 
@@ -122,7 +116,7 @@ func setUpTopLevelGenes() {
 	// Place top level genes into a runable dir
 }
 
-func runTopLevelGenes() {
+func runTopLevelGenes(config *Config) {
 	// Run the top level genes
 }
 
@@ -185,6 +179,32 @@ func autoreclaim(ctx *cli.Context) {
 }
 
 func runEvolutionMaster(ctx *cli.Context) {
+	/* Scratchpad
+	rm -rf /opt/evolution-master
+	mkdir -p /opt/evolution-master/
+	mkdir /opt/evolution-master/genepools
+	mkdir /opt/evolution-master/sequences
+	chown -r splicer:splicer /opt/evolution-master
+	chmod -r 774 /opt/evolution-master
+
+	cd /opt/evolution-master/genepools
+	-- for genepool in genepools
+		git clone genepool.url genepool.name
+		cd genepool.name
+		git checkout genepool.commit
+		cd genes
+		-- for gene in genepool.genes
+			cp -R gene.name /opt/evolution-master/sequences/genepool.name/genes/gene.name
+		cd /opt/evolution-master/sequences/genepool.name/genes
+		-- add all these genes to a queue
+		-- while queue not empty
+			-- pop gene from front of queue
+			-- check for broodfile
+			-- maybe fetch and maybe checkout git repos for genepools in broodfile
+			-- move genes from repo
+			-- push genes to back of list
+		-- apply genes
+	 */
 }
 
 func main() {

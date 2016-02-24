@@ -13,13 +13,14 @@ type GenepoolConfig struct {
 	Name             string
 	GitRepositoryURL string   `hcl:"git"`
 	Genes            []string `hcl:"genes"`
+	CheckoutVersion  string   `hcl:"checkout"`
 }
 
 func ParseGenepoolConfigs(list *ast.ObjectList) ([]*GenepoolConfig, error) {
 	return nil, nil
 }
 
-func (g *GenepoolConfig) FetchGenepool(rootDir string) error{
+func (g *GenepoolConfig) FetchGenepool(rootDir string) error {
 	cloneDir := path.Join(rootDir, g.Name)
 
 	// Check if the directory already exists
