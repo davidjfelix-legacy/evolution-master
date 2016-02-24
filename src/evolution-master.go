@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"os/exec"
 	"strings"
 	"net/http"
 	"net/url"
@@ -93,8 +92,7 @@ func splice(ctx *cli.Context) {
 	for _, genepool := range config.GenepoolConfigs {
 		// FIXME: handle error
 		repoURL, _ := url.Parse(genepool.GitRepositoryURL)
-		path := ctx.String("root-dir") + "/" + repoURL.Host + repoURL.Path
-		gitCloneGenepool(genepool.GitRepositoryURL, path)
+		ctx.String("root-dir") + "/" + repoURL.Host + repoURL.Path
 		// Walk through each gene and build its tree
 	}
 }
@@ -187,19 +185,6 @@ func autoreclaim(ctx *cli.Context) {
 }
 
 func runEvolutionMaster(ctx *cli.Context) {
-	gitCloneGenepool("https://github.com/hatchery/Brood2", "/opt/Brood2")
-}
-
-func gitCloneGenepool(rawURL string, path string) error {
-	err := os.RemoveAll(path)
-	if err != nil {
-		return err
-	}
-	// FIXME: build path
-	// FIXME: handle error here
-	out, _ := exec.Command("git", "clone", rawURL, path).CombinedOutput()
-	fmt.Printf("%s\n", out)
-	return nil
 }
 
 func main() {
