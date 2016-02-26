@@ -53,6 +53,6 @@ make install
 cd /opt/evolution-master
 git clone https://github.com/hatchery/genepool
 cd genepool
-sudo ../python/bin/python3
+# sudo ../python/bin/python3
 # assemble brood repo
 # apply brood repo
