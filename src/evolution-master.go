@@ -210,7 +210,7 @@ func runEvolutionMaster(ctx *cli.Context) {
 func main() {
 	evo := cli.NewApp()
 	evo.Name = "Evolution Master"
-	evo.Usage = "Provision your development machine."
+	evo.Usage = "Provision your development machine. Use a command or run it interactively."
 	evo.Version = "0.1.0"
 	evo.Authors = []cli.Author{
 		{
@@ -236,7 +236,7 @@ func main() {
 	evo.Commands = []cli.Command{
 		{
 			Name:   "bootstrap",
-			Usage:  "let the evolution-master install itself and interrogate you.",
+			Usage:  "let the evolution-master install itself.",
 			Action: bootstrap,
 		},
 		{
