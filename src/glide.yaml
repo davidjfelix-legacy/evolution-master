@@ -1,5 +1,4 @@
 package: .
 import:
 - package: github.com/codegangsta/cli
-  subpackages:
-  - hcl/ast
+
