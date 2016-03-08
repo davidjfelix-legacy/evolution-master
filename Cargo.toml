@@ -6,3 +6,5 @@ authors = ["David J Felix <felix.davidj@gmail.com>"]
 [dependencies.cpython]
 version = "0.0.5"
 
+[dependencies.git2]
+version = "^0.1.0"
