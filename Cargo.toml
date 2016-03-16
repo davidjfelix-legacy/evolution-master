@@ -3,6 +3,9 @@ name = "evolution-master"
 version = "0.1.0"
 authors = ["David J Felix <felix.davidj@gmail.com>"]
 
+[dependencies.primal-lang]
+git = "https://github.com/hatchery/primal-lang"
+
 [dependencies.cpython]
 version = "0.0.5"
 
